@@ -2,12 +2,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define SCREEN_SIZE 100
-#define MAX_STEPS 50
-#define MAX_DIST 50
+#define SCREEN_SIZE 60
+#define MAX_STEPS 79
+#define MAX_DIST 100
 #define SURF_DIST 0.01
 
-#define MAJ_RADIUS 5
+#define MAJ_RADIUS 7
 #define MIN_RADIUS 3
 
 #define PI 3.141
@@ -31,22 +31,25 @@ void rotateX(vec3 out, vec3 in, float a) {
 } 
 void rotateY(vec3 out, vec3 in, float a) {
     float c = cosf(a), s = sinf(a);
+    out[0] = c * in[1] + s * in[2];
     out[1] = in[0];
-    out[0] = c * in[1] - s * in[2];
-    out[2] = s * in[1] + c * in[2];
+    out[2] = -s * in[1] + c * in[2];
 }
 void rotateZ(vec3 out, vec3 in, float a) {
     float c = cosf(a), s = sinf(a);
-    out[2] = in[0];
     out[0] = c * in[1] - s * in[2];
     out[1] = s * in[1] + c * in[2];
+    out[2] = in[0];
 }
 
 float sdTorus(vec3 p, float angle) {
     vec3 rp;
-    rotateX(rp, p, 1.0f); 
-    // rotateY(rp, rp, angle); 
-    // rotateZ(rp, rp, angle); 
+    rotateX(rp, p, 1.0); 
+	vec3 temp;
+	vec3_dup(temp, rp);
+    rotateY(temp, rp, angle); 
+	vec3_dup(rp, temp);
+    rotateZ(rp, temp, angle); 
     vec2 q = { vec2_len((vec2){ rp[0], rp[2] }) - MAJ_RADIUS, rp[1] };
     return vec2_len(q) - MIN_RADIUS;
 }
@@ -94,7 +97,7 @@ void draw(FrameBuffer fb, float angle) {
 			vec3 ro;
 			ro[0] = 0;
 			ro[1] = 0;
-			ro[2] = -30;
+			ro[2] = -50;
 			vec3 rd;
 			rd[0] = (x - 0.5 * SCREEN_SIZE) / SCREEN_SIZE;
 			rd[1] = (y - 0.5 * SCREEN_SIZE) / SCREEN_SIZE;
@@ -115,12 +118,12 @@ int main() {
 
 	fb.buffer = malloc(sizeof(char) * SCREEN_SIZE * SCREEN_SIZE);
 	int count = 0;	
-	// for (;;count++) {
-	float angle = count * PI / 180;
-	draw(fb, angle);
-	outputBuffer(fb);
-		// system("clear");
-	// }
+	for (;;count++) {
+		float angle = count * PI / 180;
+		draw(fb, angle);
+		outputBuffer(fb);
+		//  system("clear");
+	}
 
 	free(fb.buffer);
 	return 0;
