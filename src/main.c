@@ -1,6 +1,7 @@
 
+#include <linmath.h>
 
-
+#define SCREEN_SIZE 100;
 
 
 float ray_march(vec3 ro, vec3 rd) {
@@ -19,6 +20,22 @@ float ray_march(vec3 ro, vec3 rd) {
   }
   return 1./0.;
 }
+
+
+
+void draw() {
+
+	for (int x = 0; x < SCREEN_SIZE; x++) {
+		for (int y = 0; y < SCREEN_SIZE; y++) {
+			//
+
+		}
+	}
+
+
+}
+
+
 
 int main() {
 
