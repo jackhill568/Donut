@@ -1,4 +1,5 @@
 #include <linmath.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -12,12 +13,26 @@
 
 #define PI 3.141
 
+vec3 LIGHT_DIR = {0, 0, -10};
+
+char SHADE[] = {'#', '*', '-', '.'};
 
 typedef struct {
 	int width;
 	int height;
 	char *buffer;
 } FrameBuffer;
+
+void vec3_set(float* M, float* T) {
+    M[0] = T[0];
+    M[1] = T[1];
+    M[2] = T[2];
+}
+
+
+float dotProduct(vec3 a, vec3 b) {
+	return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+}
 
 char *getPixel(FrameBuffer *fb, int x, int y) {
 	return &fb->buffer[y * fb->width + x];
@@ -79,6 +94,30 @@ float rayMarch(vec3 ro, vec3 rd, float angle) {
     return MAX_DIST;
 }
 
+void getNormal(vec3 normals, vec3 p, float angle) {
+
+	vec3 x , y, z;
+	
+	vec3_set(x, (vec3){0.01, 0,0});
+	vec3_set(y, (vec3){0,0.01,0});
+	vec3_set(z, (vec3){0,0,0.01});
+
+	vec3 i, j;
+	vec3_add(i, p, x);
+	vec3_sub(j, p, x);
+	normals[0] = sdTorus(i, angle) - sdTorus(j, angle);
+
+	vec3_add(i, p, y);
+	vec3_sub(j, p, y);
+	normals[1] = sdTorus(i, angle) - sdTorus(j, angle);
+
+	vec3_add(i, p, z);
+	vec3_sub(j, p, z);
+	normals[2] = sdTorus(i, angle) - sdTorus(j, angle);
+
+	vec3_norm(normals, normals);
+}
+
 void outputBuffer(FrameBuffer fb) {
 	for (int y = 0; y < fb.height; y ++) {
 		for (int x = 0; x<fb.width; x ++) {
@@ -104,8 +143,31 @@ void draw(FrameBuffer fb, float angle) {
 			rd[2] = 1;
 
 			float distance = rayMarch(ro, rd, angle);
+			
+			vec3 p;
+			vec3_scale(p, rd, distance);
+			vec3_add(p, p, ro);
 
-			*getPixel(&fb, x, y) =  (distance < MAX_DIST) ? '#' : ' ';
+			vec3 normal;
+			getNormal(normal, p, angle);
+
+			float angle = acosf(dotProduct(normal, LIGHT_DIR) / (vec3_len(normal) * vec3_len(LIGHT_DIR)));
+			char c;
+			if (distance >= MAX_DIST || angle > PI/2 + PI/8) {
+				c = ' ';
+			} else if (angle >= (PI / 2 -PI/8)) {
+				c = SHADE[3];
+			} else if (angle >= (PI/2 - PI/ 4)) {
+				c = SHADE[2];
+			} else if (angle >= (PI/2 -3* PI/8)) {
+				c = SHADE[1];
+			} else if (angle  >= 0.0){
+				c = SHADE[0];
+			} else {
+				c = '@';
+			}
+
+			*getPixel(&fb, x, y) =  c;
 		}
 	}
 }
@@ -118,6 +180,7 @@ int main() {
 
 	fb.buffer = malloc(sizeof(char) * SCREEN_SIZE * SCREEN_SIZE);
 	int count = 0;	
+
 	for (;;count++) {
 		float angle = count * PI / 180;
 		draw(fb, angle);
