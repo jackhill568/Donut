@@ -1,5 +1,6 @@
 CC      = gcc
-CFLAGS  = -Wall -Wextra -std=c99 -Iinclude -Ivendor/linmath 
+CFLAGS  = -Wall -Wextra -std=c99 -Iinclude -Ivendor/linmath.h 
+LDFLAGS = -lm
 BUILD   = build
 TARGET  = main
 SRC     = $(wildcard src/*.c)

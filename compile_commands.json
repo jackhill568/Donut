@@ -1,1 +1,19 @@
-[]
+[
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-std=c99",
+      "-Iinclude",
+      "-Ivendor/linmath.h",
+      "-c",
+      "-o",
+      "build/main.o",
+      "src/main.c"
+    ],
+    "directory": "/home/ja/CompSci/Donut",
+    "file": "/home/ja/CompSci/Donut/src/main.c",
+    "output": "/home/ja/CompSci/Donut/build/main.o"
+  }
+]
