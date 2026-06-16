@@ -2,6 +2,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #define SCREEN_SIZE 60
 #define MAX_STEPS 79
@@ -50,7 +51,6 @@ void rotateY(vec3 out, vec3 in, float a) {
   out[2] = -s * in[1] + c * in[2];
 }
 void rotateZ(vec3 out, vec3 in, float a) {
-  vec3 temp;
   float c = cosf(a), s = sinf(a);
   out[0] = c * in[1] - s * in[2];
   out[1] = s * in[1] + c * in[2];
@@ -183,6 +183,10 @@ int main() {
     float angle = count * PI / 180;
     draw(fb, angle);
     outputBuffer(fb);
+	struct timespec ts;
+	ts.tv_sec = 0;
+	ts.tv_nsec = 10000 * 100; 
+	nanosleep(&ts, NULL);
   }
   free(fb.buffer);
   return 0;
